@@ -1,5 +1,7 @@
 package selenium;
 import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,60 +25,71 @@ public class ConnectionBasicsTest extends AbstractSeleniumTest{
     
     @Test
     public void canConnect() {
-    
     	this.indexPage.connect.click();
         assertThat(this.indexPage.hasText("Successfully connected to the game with unique "), is(true));
         assertThat(this.indexPage.hasText("You have been designated the admin for this game."), is(true));
     
         this.indexPage.disconnect.click();
         assertThat(this.indexPage.hasText("Connection closed"), is(true));
-    
-        
     }
     
-
     @Test
     public void canOpenLobby() {
     	this.indexPage.connect.click();
+    	
     	this.indexPage.open.click();
     	//1: missing assertThat
-    	 this.indexPage.disconnect.click(); 
+    	assertThat(this.indexPage.hasText("Opening the lobby with specified settings."), is(true));
+    	
+    	this.indexPage.disconnect.click(); 
     }
  
     @Test
-    public void canConenctTwoPlayers() {
-    	// connect
-     	//2: missing code
+    public void canConnectTwoPlayers() {
+    	//2: connect
+    	this.indexPage.connect.click();
+    	this.indexPage.numberPlayers.clear();
+    	this.indexPage.numberPlayers.sendKeys("2");
+    	this.indexPage.open.click();
+    	assertThat(this.indexPage.hasText("When the correct number of players have connected, "), is(true));
     	
-    	//second connect
-    	//3: missing code
+    	//3: second connect
+    	ChromeDriver second = this.quickConnectAnotherUser();
+    	assertThat(this.indexPage.hasText(" has connected to the game."), is(true));
 
-    	// quit
-    	//4: missing code     	
-    	
-    	
+    	//4: quit   	
+    	this.disconnectSecondUser(second);
+    	this.indexPage.disconnect.click();
     }
     
     @Test
-    public void canConenctMultiplePlayers() {
-    	// connect 
-    	//5: missing code          	
-    	// connect second
-    	//6: missing code         
-    	// connect third then disconnect
-    	//7: missing code        
+    public void canConnectMultiplePlayers() {
+    	//5: connect one
+    	this.indexPage.connect.click();
+    	this.indexPage.numberPlayers.clear();
+    	this.indexPage.numberPlayers.sendKeys("3");
+    	this.indexPage.open.click();
+    	assertThat(this.indexPage.hasText("When the correct number of players have connected, "), is(true));
+    	
+    	//6: connect second
+    	ChromeDriver second = this.quickConnectAnotherUser();
+    	assertThat(this.indexPage.hasText(" has connected to the game."), is(true));
+    	
+    	//7: connect third then disconnect
+    	ChromeDriver third = this.quickConnectAnotherUser();
+    	assertThat(this.indexPage.hasText(" has connected to the game."), is(true));
+    	this.disconnectSecondUser(second);
+    	this.disconnectSecondUser(third);
+    	this.indexPage.disconnect.click();
  }
     
-
     @Test
     public void canStartGame() {
     	this.indexPage.connect.click();
     	this.indexPage.open.click();
     	this.indexPage.start.click();
     	//8: missing assertThat
+    	assertThat(this.indexPage.hasText("The game has started! "), is(true));
     	this.indexPage.disconnect.click();
     }
-    
-   
-    
 }
